@@ -7,7 +7,7 @@ xray_dir="/home/$(whoami)/xray"
 if ! crontab -l 2>/dev/null | grep -q "if ! pgrep -x \"xray\" > /dev/null; then cd $xray_dir && nohup ./xray run"
 then
     # 如果任务不存在，则添加新的 crontab 任务
-    (crontab -l 2>/dev/null; echo "*/12 * * * * if ! pgrep -x \"xray\" > /dev/null; then cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 & fi") | crontab - >/dev/null 2>&1
+    (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -x \"xray\" > /dev/null; then cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 & fi") | crontab - >/dev/null 2>&1
 fi
 
 # 检查重启后自动启动任务是否已存在

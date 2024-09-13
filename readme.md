@@ -11,3 +11,9 @@ bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/
 ```bash
 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/uninstall_xray.sh)
 ```
+
+## 删除所有定时任务
+
+```bash
+crontab -r
+```

@@ -13,7 +13,7 @@ pkill -f "./xray run -config config.json" > /dev/null 2>&1
 rm -rf ~/xray > /dev/null 2>&1
 ```
 
-## Action 环境变量 
+## Actions Repository Secrets
 
 ### ACCOUNTS_JSON
 

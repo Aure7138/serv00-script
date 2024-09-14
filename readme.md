@@ -23,7 +23,7 @@ UDP_PORT=UDP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/
 
 ```bash
 pkill -f "./hysteria-freebsd-amd64 server -c config.yaml" > /dev/null 2>&1
-rm -rf ~/hysteria > /dev/null 2>&1
+rm -rf ~/hysteria2 > /dev/null 2>&1
 ```
 
 ## 添加定时任务

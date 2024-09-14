@@ -1,6 +1,6 @@
 # 检查并添加 crontab 任务以保活各个进程和监控系统重启
 
-crontab -r
+crontab -r -f &>/dev/null
 
 # 设置 xray 所在的目录路径
 xray_dir="~/xray"

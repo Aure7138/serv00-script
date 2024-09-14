@@ -37,6 +37,6 @@ EOF
 # 启动 Hysteria
 nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &
 
-echo "Hysteria 已成功安装并启动"
+echo "Hysteria 配置信息"
 echo "UDP端口: $UDP_PORT"
 echo "密码: $PASSWORD"

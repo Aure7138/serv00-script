@@ -26,6 +26,12 @@ pkill -f "./hysteria-freebsd-amd64 server -c config.yaml" > /dev/null 2>&1
 rm -rf ~/hysteria > /dev/null 2>&1
 ```
 
+## 添加定时任务
+
+```bash
+bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/crontab_monitor.sh)
+```
+
 ## Actions Repository Secrets
 
 ### ACCOUNTS_JSON

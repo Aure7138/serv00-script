@@ -32,6 +32,12 @@ rm -rf ~/hysteria > /dev/null 2>&1
 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/crontab_monitor.sh)
 ```
 
+## 输出服务器 IP
+
+```bash
+echo 服务器 IP: $(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)
+```
+
 ## Actions Repository Secrets
 
 ### ACCOUNTS_JSON

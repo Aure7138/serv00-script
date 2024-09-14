@@ -20,8 +20,8 @@ cat <<EOF > config.yaml
 listen: :$UDP_PORT
 
 tls:
-  cert: ~/hysteria2/server.crt
-  key: ~/hysteria2/server.key
+  cert: $HOME/hysteria2/server.crt
+  key: $HOME/hysteria2/server.key
 
 auth:
   type: password

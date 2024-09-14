@@ -3,10 +3,9 @@
 # 设置变量
 # SOCKS_PORT=1080
 # VMESS_PORT=8080
-# SOCKS_USER="vtk"
-# SOCKS_PASS="123456"
 
 # 创建目录并进入
+cd ~
 mkdir -p xray && cd xray > /dev/null 2>&1
 
 # 下载并解压Xray
@@ -16,6 +15,10 @@ chmod +x xray
 
 # 生成UUID
 uuid=$(./xray uuid)
+
+# 生成随机的SOCKS5用户名和密码
+SOCKS_USER=$(openssl rand -base64 8)
+SOCKS_PASS=$(openssl rand -base64 12)
 
 # 创建配置文件
 cat <<EOF > config.json

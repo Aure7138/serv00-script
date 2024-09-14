@@ -5,8 +5,11 @@ crontab -r
 # 设置 xray 所在的目录路径
 xray_dir="~/xray"
 
-# 添加新的保活任务
-(crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -x \"xray\" > /dev/null; then cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 & fi") | crontab -
+# 判断目录是否存在
+if [ -d "$xray_dir" ]; then
+    # 添加新的保活任务
+    (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -x \"xray\" > /dev/null; then cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 & fi") | crontab -
 
-# 添加新的重启后自动启动任务
-(crontab -l 2>/dev/null; echo "@reboot pkill -f \"xray run -config config.json\" && cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 &") | crontab -
+    # 添加新的重启后自动启动任务
+    (crontab -l 2>/dev/null; echo "@reboot pkill -f \"xray run -config config.json\" && cd $xray_dir && nohup ./xray run -config config.json > /dev/null 2>&1 &") | crontab -
+fi

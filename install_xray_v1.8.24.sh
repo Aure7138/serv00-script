@@ -64,8 +64,9 @@ cat <<EOF > config.json
 EOF
 
 # 启动Xray
-nohup ./xray run -config config.json > /dev/null 2>&1 &
+nohup ./xray run -c config.json > /dev/null 2>&1 &
 
+echo "Xray 已成功安装并启动"
 echo "SOCKS5端口: $SOCKS_PORT"
 echo "SOCKS5用户名: $SOCKS_USER"
 echo "SOCKS5密码: $SOCKS_PASS"

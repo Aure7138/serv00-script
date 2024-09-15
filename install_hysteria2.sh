@@ -36,8 +36,17 @@ masquerade:
     rewriteHost: true
 EOF
 
+    # 执行 Hysteria2 并捕获输出
+    output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & sleep 1; pkill -f "./hysteria-freebsd-amd64 server -c config.yaml")
+    echo "Hysteria2 启动输出:"
+    echo "$output"
+
     # 启动 Hysteria
     nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &
+
+    # 输出 Hysteria2 进程信息
+    echo "Hysteria2 进程信息:"
+    ps aux | grep "[h]ysteria-freebsd-amd64 server -c config.yaml"
 
     echo "Hysteria 配置信息"
     echo "UDP端口: $UDP_PORT"

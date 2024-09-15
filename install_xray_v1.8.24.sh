@@ -65,10 +65,22 @@ install_xray() {
 }
 EOF
 
-    ./xray run -c config.json -test
+    # 执行 Xray 配置测试并捕获输出
+    test_output=$(./xray run -c config.json -test 2>&1)
+    echo "Xray 配置测试输出:"
+    echo "$test_output"
+
+    # 执行 Xray 并捕获输出
+    output=$(./xray run -c config.json 2>&1 & sleep 1; pkill -f "./xray run -c config.json")
+    echo "Xray 启动输出:"
+    echo "$output"
 
     # 启动Xray
     nohup ./xray run -c config.json > /dev/null 2>&1 &
+    
+    # 输出 Xray 进程信息
+    echo "Xray 进程信息:"
+    ps aux | grep "[x]ray run -c config.json"
 
     echo "Xray 配置信息"
     echo "SOCKS5端口: $SOCKS_PORT"

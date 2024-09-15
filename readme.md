@@ -10,7 +10,7 @@ SOCKS_PORT=TCP端口 VMESS_PORT=TCP端口 bash <(curl -L -s https://raw.githubus
 
 ```bash
 pkill -f "./xray run -c config.json" > /dev/null 2>&1
-rm -rf ~/xray > /dev/null 2>&1
+rm -rf $HOME/xray > /dev/null 2>&1
 ```
 
 ## 安装 Hysteria2
@@ -23,7 +23,7 @@ UDP_PORT=UDP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/
 
 ```bash
 pkill -f "./hysteria-freebsd-amd64 server -c config.yaml" > /dev/null 2>&1
-rm -rf ~/hysteria2 > /dev/null 2>&1
+rm -rf $HOME/hysteria2 > /dev/null 2>&1
 ```
 
 ## 添加定时任务

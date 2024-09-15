@@ -5,7 +5,7 @@
 # VMESS_PORT=8080
 
 # 创建目录并进入
-cd ~
+cd $HOME
 mkdir -p xray && cd xray > /dev/null 2>&1
 
 # 下载并解压Xray

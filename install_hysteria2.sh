@@ -5,7 +5,7 @@
 PASSWORD=$(openssl rand -base64 12)
 
 # 创建目录并进入
-cd ~
+cd $HOME
 mkdir -p hysteria2 && cd hysteria2 > /dev/null 2>&1
 
 # 下载 Hysteria

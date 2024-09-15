@@ -48,7 +48,7 @@ EOF
     echo "Hysteria2 进程信息:"
     ps aux | grep "[h]ysteria-freebsd-amd64 server -c config.yaml"
 
-    echo "Hysteria 配置信息"
+    echo "Hysteria2 配置信息"
     echo "UDP端口: $UDP_PORT"
     echo "密码: $PASSWORD"
     echo 服务器 IP: $(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)

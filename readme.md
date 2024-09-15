@@ -32,6 +32,12 @@ rm -rf $HOME/hysteria2 > /dev/null 2>&1
 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/crontab_monitor.sh)
 ```
 
+## 删除定时任务
+
+```bash
+crontab -r -f
+```
+
 ## 输出服务器 IP
 
 ```bash

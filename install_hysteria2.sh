@@ -7,8 +7,7 @@ install_hysteria2() {
     PASSWORD=$(openssl rand -base64 12)
 
     # 创建目录并进入
-    cd $HOME
-    mkdir -p hysteria2 && cd hysteria2 > /dev/null 2>&1
+    mkdir -p "$HOME/hysteria2" && cd "$HOME/hysteria2" > /dev/null 2>&1
 
     # 下载 Hysteria
     curl -s -L -O https://github.com/apernet/hysteria/releases/latest/download/hysteria-freebsd-amd64 > /dev/null 2>&1
@@ -22,8 +21,8 @@ install_hysteria2() {
 listen: :$UDP_PORT
 
 tls:
-  cert: $HOME/hysteria2/server.crt
-  key: $HOME/hysteria2/server.key
+  cert: "$HOME/hysteria2/server.crt"
+  key: "$HOME/hysteria2/server.key"
 
 auth:
   type: password
@@ -57,8 +56,23 @@ EOF
 # 卸载 Hysteria2
 uninstall_hysteria2() {
     pkill -f "./hysteria-freebsd-amd64 server -c config.yaml" > /dev/null 2>&1
-    rm -rf $HOME/hysteria2 > /dev/null 2>&1
+    rm -rf "$HOME/hysteria2" > /dev/null 2>&1
     echo "Hysteria2 已成功卸载"
+}
+
+# 添加定时任务
+add_crontab() {
+    if [ -d "$HOME/hysteria2" ]; then
+        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./hysteria-freebsd-amd64 server -c config.yaml\" > /dev/null; then cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 & fi") | crontab -
+        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./hysteria-freebsd-amd64 server -c config.yaml\" && cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &") | crontab -
+    fi
+    echo "Hysteria2 定时任务已添加"
+}
+
+# 删除定时任务
+remove_crontab() {
+    crontab -l 2>/dev/null | grep -v "cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &" | crontab -
+    echo "Hysteria2 定时任务已删除"
 }
 
 # 主函数
@@ -67,22 +81,32 @@ main() {
         echo "请选择操作："
         echo "1. 安装 Hysteria2"
         echo "2. 卸载 Hysteria2"
-        read -p "输入选项 (1 或 2): " choice
+        echo "3. 添加定时任务"
+        echo "4. 删除定时任务"
+        read -p "输入选项 (可多选，用空格分隔): " -a choices
     else
-        choice=$1
+        choices=("$@")
     fi
 
-    case $choice in
-        1)
-            install_hysteria2
-            ;;
-        2)
-            uninstall_hysteria2
-            ;;
-        *)
-            echo "无效的选项，请输入 1 或 2"
-            ;;
-    esac
+    for choice in "${choices[@]}"; do
+        case $choice in
+            1)
+                install_hysteria2
+                ;;
+            2)
+                uninstall_hysteria2
+                ;;
+            3)
+                add_crontab
+                ;;
+            4)
+                remove_crontab
+                ;;
+            *)
+                echo "无效的选项: $choice，请输入 1, 2, 3 或 4"
+                ;;
+        esac
+    done
 }
 
 # 执行主函数

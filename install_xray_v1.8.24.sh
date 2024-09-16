@@ -7,8 +7,7 @@ install_xray() {
     # VMESS_PORT=8080
 
     # 创建目录并进入
-    cd $HOME
-    mkdir -p xray && cd xray > /dev/null 2>&1
+    mkdir -p "$HOME/xray" && cd "$HOME/xray" > /dev/null 2>&1
 
     # 下载并解压Xray
     curl -s -L -O https://github.com/XTLS/Xray-core/releases/download/v1.8.24/Xray-freebsd-64.zip > /dev/null 2>&1
@@ -94,8 +93,23 @@ EOF
 # 函数：卸载 Xray
 uninstall_xray() {
     pkill -f "./xray run -c config.json" > /dev/null 2>&1
-    rm -rf $HOME/xray > /dev/null 2>&1
+    rm -rf "$HOME/xray" > /dev/null 2>&1
     echo "Xray 已成功卸载"
+}
+
+# 函数：添加定时任务
+add_crontab() {
+    if [ -d "$HOME/xray" ]; then
+        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run -c config.json\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config.json > /dev/null 2>&1 & fi") | crontab -
+        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run -c config.json\" && cd \"$HOME/xray\" && nohup ./xray run -c config.json > /dev/null 2>&1 &") | crontab -
+    fi
+    echo "Xray 定时任务已添加"
+}
+
+# 函数：删除定时任务
+remove_crontab() {
+    crontab -l 2>/dev/null | grep -v "cd \"$HOME/xray\" && nohup ./xray run -c config.json > /dev/null 2>&1 &" | crontab -
+    echo "Xray 定时任务已删除"
 }
 
 # 主函数
@@ -104,22 +118,32 @@ main() {
         echo "请选择操作："
         echo "1. 安装 Xray"
         echo "2. 卸载 Xray"
-        read -p "输入选项 (1 或 2): " choice
+        echo "3. 添加定时任务"
+        echo "4. 删除定时任务"
+        read -p "输入选项 (可多选，用空格分隔): " -a choices
     else
-        choice=$1
+        choices=("$@")
     fi
 
-    case $choice in
-        1)
-            install_xray
-            ;;
-        2)
-            uninstall_xray
-            ;;
-        *)
-            echo "无效的选项，请输入 1 或 2"
-            ;;
-    esac
+    for choice in "${choices[@]}"; do
+        case $choice in
+            1)
+                install_xray
+                ;;
+            2)
+                uninstall_xray
+                ;;
+            3)
+                add_crontab
+                ;;
+            4)
+                remove_crontab
+                ;;
+            *)
+                echo "无效的选项: $choice，请输入 1, 2, 3 或 4"
+                ;;
+        esac
+    done
 }
 
 # 执行主函数

@@ -3,25 +3,25 @@
 ## 安装 Xray
 
 ```bash
-SOCKS_PORT=TCP端口 VMESS_PORT=TCP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 1
+SOCKS_PORT=TCP端口 VMESS_PORT=TCP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 1 3
 ```
 
 ## 卸载 Xray
 
 ```bash
-bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 2
+bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 2 4
 ```
 
 ## 安装 Hysteria2
 
 ```bash
-UDP_PORT=UDP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_hysteria2.sh) 1
+UDP_PORT=UDP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_hysteria2.sh) 1 3
 ```
 
 ## 卸载 Hysteria2
 
 ```bash
-bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_hysteria2.sh) 2
+bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_hysteria2.sh) 2 4
 ```
 
 ## 添加定时任务

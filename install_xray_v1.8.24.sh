@@ -3,8 +3,8 @@
 # 函数：安装 Xray
 install_xray() {
     # 设置变量
-    # SOCKS_PORT=1080
-    # VMESS_PORT=8080
+    # TCP_PORT_1=1080
+    # TCP_PORT_2=8080
 
     # 创建目录并进入
     mkdir -p "$HOME/xray" && cd "$HOME/xray" > /dev/null 2>&1
@@ -27,7 +27,7 @@ install_xray() {
   "inbounds": [
     {
       "listen": "0.0.0.0",
-      "port": $SOCKS_PORT,
+      "port": $TCP_PORT_1,
       "protocol": "socks",
       "settings": {
         "auth": "password",
@@ -41,7 +41,7 @@ install_xray() {
     },
     {
       "listen": "0.0.0.0",
-      "port": $VMESS_PORT,
+      "port": $TCP_PORT_2,
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -82,10 +82,10 @@ EOF
     ps aux | grep "[x]ray run -c config.json"
 
     echo "Xray 配置信息"
-    echo "SOCKS5端口: $SOCKS_PORT"
+    echo "SOCKS5端口: $TCP_PORT_1"
     echo "SOCKS5用户名: $SOCKS_USER"
     echo "SOCKS5密码: $SOCKS_PASS"
-    echo "VMess端口: $VMESS_PORT"
+    echo "VMess端口: $TCP_PORT_2"
     echo "VMess UUID: $uuid"
     echo 服务器 IP: $(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)
 }

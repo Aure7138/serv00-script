@@ -174,7 +174,7 @@ install_xray() {
     read -r uuid2 serverName publicKey shortId <<< $(generate_vless_tcp_reality_vision_config "$TCP_PORT_2" "$HOME/xray" "config_vless_tcp_reality_vision.json")
 
     # 执行 Xray 并捕获输出
-    local output=$(./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json 2>&1 & sleep 1; pkill -f "./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json")
+    local output=$(./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json 2>&1 & sleep 1; pkill -f "./xray run")
     echo "Xray 启动输出:"
     echo "$output"
 

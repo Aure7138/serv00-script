@@ -1,32 +1,81 @@
 #!/bin/bash
 
-# 安装 Hysteria2
-install_hysteria2() {
-    # 设置变量
-    # UDP_PORT=8080
-    PASSWORD=$(openssl rand -base64 12)
+# 检查系统是否为 FreeBSD amd64
+if [ "$(uname)" != "FreeBSD" ] || [ "$(uname -m)" != "amd64" ]; then
+    echo "此脚本仅支持 FreeBSD amd64 系统。"
+    exit 1
+fi
 
-    # 创建目录并进入
-    mkdir -p "$HOME/hysteria2" && cd "$HOME/hysteria2" > /dev/null 2>&1
+# 检查端口是否可用
+check_port() {
+    local port=$1
+    local protocol=$2
+    local timeout=1  # 设置超时时间（秒）
 
-    # 下载 Hysteria
-    curl -s -L -O https://github.com/apernet/hysteria/releases/latest/download/hysteria-freebsd-amd64 > /dev/null 2>&1
-    chmod +x hysteria-freebsd-amd64
+    case $protocol in
+        tcp)
+            (
+                exec 3<>"/dev/tcp/127.0.0.1/$port"
+                echo "success" >&3
+                exec 3>&-
+            ) 2>/dev/null &
+            ;;
+        udp)
+            (
+                exec 3<>"/dev/udp/127.0.0.1/$port"
+                echo "success" >&3
+                exec 3>&-
+            ) 2>/dev/null &
+            ;;
+        *)
+            echo "无效的协议: $protocol"
+            return 2
+            ;;
+    esac
+
+    local pid=$!
+    local start_time=$(date +%s)
+
+    while [ $(($(date +%s) - start_time)) -lt $timeout ]; do
+        if ! kill -0 $pid 2>/dev/null; then
+            echo "端口 $port ($protocol) 可用"
+            return 0
+        fi
+    done
+
+    kill $pid 2>/dev/null
+    wait $pid 2>/dev/null
+    echo "端口 $port ($protocol) 不可用或无法绑定"
+    return 1
+}
+
+# 生成 Hysteria2 配置函数
+generate_hysteria2_config() {
+    local port="$1"
+    local path="$2"
+    local filename="$3"
+    local password
+
+    # 生成密码
+    password=$(openssl rand -base64 16)
 
     # 生成证书
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout server.key -out server.crt -subj "/CN=bing.com" -days 36500 > /dev/null 2>&1
+    if ! openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout "$path/server.key" -out "$path/server.crt" -subj "/CN=bing.com" -days 36500 2>/dev/null; then
+        echo "生成证书失败"
+        return 1
+    fi
 
     # 创建配置文件
-    cat <<EOF > config.yaml
-listen: :$UDP_PORT
+    cat <<EOF > "$path/$filename"
+listen: :$port
 
 tls:
-  cert: "$HOME/hysteria2/server.crt"
-  key: "$HOME/hysteria2/server.key"
+  cert: $path/server.crt
+  key: $path/server.key
 
 auth:
   type: password
-  password: $PASSWORD
+  password: $password
   
 masquerade:
   type: proxy
@@ -34,6 +83,41 @@ masquerade:
     url: https://bing.com
     rewriteHost: true
 EOF
+
+    echo "$password"
+}
+
+# 安装 Hysteria2
+install_hysteria2() {
+    # 检查端口是否可用
+    if ! check_port $UDP_PORT udp; then
+        echo "端口 $UDP_PORT 不可用，请选择其他端口"
+        return 1
+    fi
+
+    # 创建目录并进入
+    mkdir -p "$HOME/hysteria2" && cd "$HOME/hysteria2" || { echo "创建目录失败"; return 1; }
+
+    # 下载 Hysteria
+    if ! curl -s -L -O https://github.com/apernet/hysteria/releases/latest/download/hysteria-freebsd-amd64; then
+        echo "下载 Hysteria 失败"
+        return 1
+    fi
+    chmod +x hysteria-freebsd-amd64
+
+    # 获取服务器 IP
+    SERVER_IP=$(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)
+    if [ -z "$SERVER_IP" ]; then
+        echo "获取服务器 IP 失败"
+        return 1
+    fi
+
+    # 生成配置并获取密码
+    PASSWORD=$(generate_hysteria2_config "$UDP_PORT" "$HOME/hysteria2" "config.yaml")
+    if [ $? -ne 0 ]; then
+        echo "生成配置失败"
+        return 1
+    fi
 
     # 执行 Hysteria2 并捕获输出
     output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & sleep 1; pkill -f "./hysteria-freebsd-amd64 server -c config.yaml")
@@ -50,13 +134,14 @@ EOF
     echo "Hysteria2 配置信息"
     echo "UDP端口: $UDP_PORT"
     echo "密码: $PASSWORD"
-    echo 服务器 IP: $(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)
+    echo "服务器 IP: $SERVER_IP"
+    echo "配置链接: hysteria2://$PASSWORD@$SERVER_IP:$UDP_PORT/?sni=bing.com&insecure=1#hysteria2"
 }
 
 # 卸载 Hysteria2
 uninstall_hysteria2() {
-    pkill -f "./hysteria-freebsd-amd64 server -c config.yaml" > /dev/null 2>&1
-    rm -rf "$HOME/hysteria2" > /dev/null 2>&1
+    pkill -f "./hysteria-freebsd-amd64 server -c config.yaml"
+    rm -rf "$HOME/hysteria2"
     echo "Hysteria2 已成功卸载"
 }
 

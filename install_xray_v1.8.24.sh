@@ -217,8 +217,11 @@ add_crontab() {
     if [ -d "$HOME/xray" ]; then
         (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 & fi") | crontab -
         (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run\" && cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &") | crontab -
+        echo "Xray 定时任务已添加"
+    else
+        echo "错误：Xray 目录不存在，无法添加定时任务"
+        return 1
     fi
-    echo "Xray 定时任务已添加"
 }
 
 # 函数：删除定时任务

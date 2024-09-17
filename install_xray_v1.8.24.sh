@@ -202,7 +202,7 @@ install_xray() {
     echo "Vless+tcp+reality sni: $serverName"
     echo "Vless+tcp+reality publicKey: $publicKey"
     echo "Vless+tcp+reality shortId: $shortId"
-    echo "Vless+tcp+reality 配置链接: vless://$uuid2@$SERVER_IP:$TCP_PORT_2?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$serverName&fp=chrome&pbk=$publicKey&sid=$shortId&type=tcp#vless+tcp+reality"
+    echo "Vless+tcp+reality 配置链接: vless://$uuid2@$SERVER_IP:$TCP_PORT_2?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$serverName&fp=safari&pbk=$publicKey&sid=$shortId&type=tcp#vless+tcp+reality"
 }
 
 # 函数：卸载 Xray

@@ -287,7 +287,7 @@ local shortId=$(openssl rand -hex $((RANDOM % 7 + 2)))
         "network": "tcp",
         "security": "reality",
         "realitySettings": {
-            "fingerprint": "chrome", 
+            "fingerprint": "safari", 
             "serverName": "$serverName",
             "publicKey": "$publicKey",
             "shortId": "$shortId"

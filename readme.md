@@ -2,7 +2,7 @@
 
 ## 安装 Xray
 ```bash
-SOCKS_PORT=TCP端口 VMESS_PORT=TCP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 1 3
+TCP_PORT_1=TCP端口 TCP_PORT_2=TCP端口 bash <(curl -L -s https://raw.githubusercontent.com/Aure7138/serv00-script/main/install_xray_v1.8.24.sh) 1 3
 ```
 
 ## 卸载 Xray

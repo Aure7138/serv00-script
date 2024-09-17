@@ -207,7 +207,7 @@ install_xray() {
 
 # 函数：卸载 Xray
 uninstall_xray() {
-    pkill -f "./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json"
+    pkill -f "./xray run"
     rm -rf "$HOME/xray"
     echo "Xray 已成功卸载"
 }
@@ -215,15 +215,15 @@ uninstall_xray() {
 # 函数：添加定时任务
 add_crontab() {
     if [ -d "$HOME/xray" ]; then
-        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 & fi") | crontab -
-        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json\" && cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &") | crontab -
+        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 & fi") | crontab -
+        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run\" && cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &") | crontab -
     fi
     echo "Xray 定时任务已添加"
 }
 
 # 函数：删除定时任务
 remove_crontab() {
-    crontab -l 2>/dev/null | grep -v "cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &" | crontab -
+    crontab -l 2>/dev/null | grep -v "cd \"$HOME/xray\"" | crontab -
     echo "Xray 定时任务已删除"
 }
 

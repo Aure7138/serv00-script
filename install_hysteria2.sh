@@ -59,12 +59,13 @@ generate_hysteria2_config() {
     local path="$2"
     local filename="$3"
     local password
+    local domain="bing.com"
 
     # 生成密码
     password=$(openssl rand -base64 16)
 
     # 生成证书
-    if ! openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout "$path/server.key" -out "$path/server.crt" -subj "/CN=bing.com" -days 36500 2>/dev/null; then
+    if ! openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout "$path/server.key" -out "$path/server.crt" -subj "/CN=$domain" -days 36500 2>/dev/null; then
         echo "生成证书失败"
         return 1
     fi
@@ -84,11 +85,11 @@ auth:
 masquerade:
   type: proxy
   proxy:
-    url: https://bing.com
+    url: https://$domain
     rewriteHost: true
 EOF
 
-    echo "$password"
+    echo "$password $domain"
 }
 
 # 安装 Hysteria2
@@ -116,8 +117,8 @@ install_hysteria2() {
         return 1
     fi
 
-    # 生成配置并获取密码
-    PASSWORD=$(generate_hysteria2_config "$UDP_PORT" "$HOME/hysteria2" "config.yaml")
+    # 生成配置并获取密码和域名
+    read -r PASSWORD DOMAIN <<< $(generate_hysteria2_config "$UDP_PORT" "$HOME/hysteria2" "config.yaml")
     if [ $? -ne 0 ]; then
         echo "生成配置失败"
         return 1
@@ -141,7 +142,8 @@ install_hysteria2() {
     echo "UDP端口: $UDP_PORT"
     echo "密码: $PASSWORD"
     echo "服务器 IP: $SERVER_IP"
-    echo "配置链接: hysteria2://$PASSWORD@$SERVER_IP:$UDP_PORT/?sni=bing.com&insecure=1#hysteria2"
+    echo "域名: $DOMAIN"
+    echo "配置链接: hysteria2://$PASSWORD@$SERVER_IP:$UDP_PORT/?sni=$DOMAIN&insecure=1#hysteria2"
 }
 
 # 卸载 Hysteria2

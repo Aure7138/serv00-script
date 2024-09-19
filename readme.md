@@ -85,7 +85,8 @@ local password=$(tr -dc 'a-zA-Z0-9!@#$%^&*()_+' < /dev/urandom | fold -w 12 | he
                 "pass": "$password"
             }
         ]
-    }
+    },
+    "tag": "inbounds-$port"
 }
 ```
 
@@ -136,7 +137,8 @@ local uuid=$(./xray uuid)
     },
     "streamSettings": {
         "network": "ws"
-    }
+    },
+    "tag": "inbounds-$port"
 }
 ```
 
@@ -189,7 +191,8 @@ local uuid=$(./xray uuid)
     },
     "streamSettings": {
         "network": "ws"
-    }
+    },
+    "tag": "inbounds-$port"
 }
 ```
 
@@ -216,6 +219,83 @@ local uuid=$(./xray uuid)
     }
 }
 ```
+
+## VLESS+TCP+TLS+VISION
+
+```base
+local port="$1"
+local path="$2"
+local filename="$3"
+local uuid=$(./xray uuid)
+local domain="bing.com"
+```
+
+### InboundObject
+
+```json
+{
+    "port": $port,
+    "protocol": "vless",
+    "settings": {
+        "clients": [
+            {
+                "id": "$uuid",
+                "flow": "xtls-rprx-vision"
+            }
+        ],
+        "decryption": "none"
+    },
+    "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+            "rejectUnknownSni": true,
+            "minVersion": "1.2",
+            "certificates": [
+                {
+                    "ocspStapling": 3600,
+                    "certificateFile": "$path/server.crt",
+                    "keyFile": "$path/server.key"
+                }
+            ]
+        }
+    },
+    "tag": "inbounds-$port"
+}
+``` 
+
+### OutboundObject
+
+```json
+{
+    "protocol": "vless",
+    "settings": {
+        "vnext": [
+            {
+                "address": "$SERVER_IP",
+                "port": $port,
+                "users": [
+                    {
+                        "id": "$uuid",
+                        "encryption": "none",
+                        "flow": "xtls-rprx-vision"
+                    }
+                ]
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+            "serverName": "$domain",
+            "allowInsecure": true,
+            "fingerprint": "safari"
+        }
+    }
+}
+```
+
 
 ## VLESS+TCP+REALITY+VISION
 
@@ -259,7 +339,8 @@ local shortId=$(openssl rand -hex $((RANDOM % 7 + 2)))
                 "$shortId"
             ]
         }
-    }
+    },
+    "tag": "inbounds-$port"
 }
 ```
 

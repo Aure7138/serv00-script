@@ -148,13 +148,13 @@ install_xray() {
     # TCP_PORT_1=1080
     # TCP_PORT_2=8080
 
-    # 检查端口是否可用
+    # 检查端口是否可用且可绑定
     if ! check_port $TCP_PORT_1 tcp; then
-        echo "端口 $TCP_PORT_1 不可用，请选择其他端口"
+        echo "端口 $TCP_PORT_1 不可用或无法绑定，请选择其他端口或检查权限"
         return 1
     fi
     if ! check_port $TCP_PORT_2 tcp; then
-        echo "端口 $TCP_PORT_2 不可用，请选择其他端口"
+        echo "端口 $TCP_PORT_2 不可用或无法绑定，请选择其他端口或检查权限"
         return 1
     fi
 

@@ -235,15 +235,16 @@ install_xray() {
 
     # 生成UUID
     local uuid1=$(generate_vless_ws_config "$TCP_PORT_1" "$HOME/xray" "config_vless_ws.json")
-    read -r uuid2 domain <<< $(generate_vless_tcp_tls_vision_config "$TCP_PORT_2" "$HOME/xray" "config_vless_tcp_tls_vision.json")
+    # read -r uuid2 domain <<< $(generate_vless_tcp_tls_vision_config "$TCP_PORT_2" "$HOME/xray" "config_vless_tcp_tls_vision.json")
+    read -r uuid2 serverName publicKey shortId <<< $(generate_vless_tcp_reality_vision_config "$TCP_PORT_2" "$HOME/xray" "config_vless_tcp_reality_vision.json")
 
     # 执行 Xray 并捕获输出
-    local output=$(./xray run -c config_vless_ws.json -c config_vless_tcp_tls_vision.json 2>&1 & xray_pid=$!; sleep 1; pkill -f "./xray run"; wait $xray_pid 2>/dev/null)
+    local output=$(./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json 2>&1 & xray_pid=$!; sleep 1; pkill -f "./xray run"; wait $xray_pid 2>/dev/null)
     echo "Xray 启动输出:"
     echo "$output"
 
     # 启动Xray
-    nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_tls_vision.json > /dev/null 2>&1 &
+    nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &
 
     sleep 1
     
@@ -264,11 +265,19 @@ install_xray() {
     echo "UUID: $uuid1"
     echo "服务器 IP: $SERVER_IP"
     echo "配置链接: vless://$uuid1@$SERVER_IP:$TCP_PORT_1?encryption=none&type=ws#vless+ws"
-    echo "Vless+tcp+tls+vision 配置信息"
+    # echo "Vless+tcp+tls+vision 配置信息"
+    # echo "端口: $TCP_PORT_2"
+    # echo "UUID: $uuid2"
+    # echo "域名: $domain"
+    # echo "Vless+tcp+tls+vision 配置链接: vless://$uuid2@$SERVER_IP:$TCP_PORT_2?encryption=none&flow=xtls-rprx-vision&security=tls&sni=$domain&fp=safari&allowInsecure=1&type=tcp#vless+tcp+tls+vision"
+    echo "Vless+tcp+reality+vision 配置信息"
     echo "端口: $TCP_PORT_2"
     echo "UUID: $uuid2"
-    echo "域名: $domain"
-    echo "Vless+tcp+tls+vision 配置链接: vless://$uuid2@$SERVER_IP:$TCP_PORT_2?encryption=none&flow=xtls-rprx-vision&security=tls&sni=$domain&fp=safari&allowInsecure=1&type=tcp#vless+tcp+tls+vision"
+    echo "sni: $serverName"
+    echo "publicKey: $publicKey"
+    echo "shortId: $shortId"
+    echo "服务器 IP: $SERVER_IP"
+    echo "配置链接: vless://$uuid2@$SERVER_IP:$TCP_PORT_2?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$serverName&fp=safari&pbk=$publicKey&sid=$shortId&type=tcp#vless+tcp+reality+vision"
 }
 
 # 函数：卸载 Xray
@@ -281,8 +290,8 @@ uninstall_xray() {
 # 函数：添加定时任务
 add_crontab() {
     if [ -d "$HOME/xray" ]; then
-        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_tls_vision.json > /dev/null 2>&1 & fi") | crontab -
-        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run\" && cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_tls_vision.json > /dev/null 2>&1 &") | crontab -
+        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./xray run\" > /dev/null; then cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 & fi") | crontab -
+        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./xray run\" && cd \"$HOME/xray\" && nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &") | crontab -
         echo "Xray 定时任务已添加"
     else
         echo "错误：Xray 目录不存在，无法添加定时任务"

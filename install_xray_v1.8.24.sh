@@ -76,7 +76,8 @@ generate_vless_ws_config() {
       },
       "streamSettings": {
         "network": "ws"
-      }
+      },
+      "tag": "inbounds-$port"
     }
   ],
   "outbounds": [
@@ -132,7 +133,8 @@ generate_vless_tcp_reality_vision_config() {
           "privateKey": "$privateKey",
           "shortIds": ["$shortId"]
         }
-      }
+      },
+      "tag": "inbounds-$port"
     }
   ],
   "outbounds": [

@@ -154,8 +154,11 @@ add_crontab() {
     if [ -d "$HOME/hysteria2" ]; then
         (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./hysteria-freebsd-amd64 server -c config.yaml\" > /dev/null; then cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 & fi") | crontab -
         (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./hysteria-freebsd-amd64 server -c config.yaml\" && cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &") | crontab -
+        echo "Hysteria2 定时任务已添加"
+    else
+        echo "Hysteria2 目录不存在，无法添加定时任务"
+        return 1
     fi
-    echo "Hysteria2 定时任务已添加"
 }
 
 # 删除定时任务

@@ -184,10 +184,12 @@ install_xray() {
 
     # 启动Xray
     nohup ./xray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json > /dev/null 2>&1 &
+
+    sleep 1
     
     # 输出 Xray 进程信息
     echo "Xray 进程信息:"
-    ps aux | grep "[x]ray run -c config_vless_ws.json -c config_vless_tcp_reality_vision.json"
+    ps aux | grep "[x]ray run"
 
     # 获取服务器 IP
     local SERVER_IP=$(curl -s ifconfig.me || curl -s ifconfig.co || curl -s ifconfig.me/ip || curl -s ifconfig.co/ip || curl -s ipinfo.io/ip)

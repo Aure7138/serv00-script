@@ -124,16 +124,18 @@ install_hysteria2() {
     fi
 
     # 执行 Hysteria2 并捕获输出
-    output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & hysteria_pid=$!; sleep 1; pkill -f "./hysteria-freebsd-amd64 server -c config.yaml"; wait $hysteria_pid 2>/dev/null)
+    output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & hysteria_pid=$!; sleep 1; pkill -f "./hysteria-freebsd-amd64 server"; wait $hysteria_pid 2>/dev/null)
     echo "Hysteria2 启动输出:"
     echo "$output"
 
     # 启动 Hysteria
     nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &
 
+    sleep 1
+
     # 输出 Hysteria2 进程信息
     echo "Hysteria2 进程信息:"
-    ps aux | grep "[h]ysteria-freebsd-amd64 server -c config.yaml"
+    ps aux | grep "[h]ysteria-freebsd-amd64 server"
 
     echo "Hysteria2 配置信息"
     echo "UDP端口: $UDP_PORT"
@@ -144,7 +146,7 @@ install_hysteria2() {
 
 # 卸载 Hysteria2
 uninstall_hysteria2() {
-    pkill -f "./hysteria-freebsd-amd64 server -c config.yaml"
+    pkill -f "./hysteria-freebsd-amd64 server"
     rm -rf "$HOME/hysteria2"
     echo "Hysteria2 已成功卸载"
 }
@@ -152,8 +154,8 @@ uninstall_hysteria2() {
 # 添加定时任务
 add_crontab() {
     if [ -d "$HOME/hysteria2" ]; then
-        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./hysteria-freebsd-amd64 server -c config.yaml\" > /dev/null; then cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 & fi") | crontab -
-        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./hysteria-freebsd-amd64 server -c config.yaml\" && cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &") | crontab -
+        (crontab -l 2>/dev/null; echo "*/5 * * * * if ! pgrep -f \"./hysteria-freebsd-amd64 server\" > /dev/null; then cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 & fi") | crontab -
+        (crontab -l 2>/dev/null; echo "@reboot pkill -f \"./hysteria-freebsd-amd64 server\" && cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &") | crontab -
         echo "Hysteria2 定时任务已添加"
     else
         echo "Hysteria2 目录不存在，无法添加定时任务"
@@ -163,7 +165,7 @@ add_crontab() {
 
 # 删除定时任务
 remove_crontab() {
-    crontab -l 2>/dev/null | grep -v "cd \"$HOME/hysteria2\" && nohup ./hysteria-freebsd-amd64 server -c config.yaml > /dev/null 2>&1 &" | crontab -
+    crontab -l 2>/dev/null | grep -v "cd \"$HOME/hysteria2\"" | crontab -
     echo "Hysteria2 定时任务已删除"
 }
 

@@ -124,7 +124,7 @@ install_hysteria2() {
     fi
 
     # 执行 Hysteria2 并捕获输出
-    output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & sleep 1; pkill -f "./hysteria-freebsd-amd64 server -c config.yaml")
+    output=$(./hysteria-freebsd-amd64 server -c config.yaml 2>&1 & hysteria_pid=$!; sleep 1; pkill -f "./hysteria-freebsd-amd64 server -c config.yaml"; wait $hysteria_pid 2>/dev/null)
     echo "Hysteria2 启动输出:"
     echo "$output"
 

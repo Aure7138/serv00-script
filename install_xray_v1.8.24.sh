@@ -38,6 +38,10 @@ check_port() {
 
     local pid=$!
 
+    echo $pid >/dev/null 2>&1
+
+    ps aux >/dev/null 2>&1
+
     if kill -0 $pid 2>/dev/null; then
         kill $pid
         wait $pid 2>/dev/null

@@ -6,47 +6,47 @@ if [ "$(uname)" != "FreeBSD" ] || [ "$(uname -m)" != "amd64" ]; then
     exit 1
 fi
 
-# 检查端口是否可用
+# 检查端口是否可用且可绑定
 check_port() {
     local port=$1
     local protocol=$2
-    local timeout=1  # 设置超时时间（秒）
 
-    case $protocol in
-        tcp)
-            (
-                exec 3<>"/dev/tcp/127.0.0.1/$port"
-                echo "success" >&3
-                exec 3>&-
-            ) 2>/dev/null &
-            ;;
-        udp)
-            (
-                exec 3<>"/dev/udp/127.0.0.1/$port"
-                echo "success" >&3
-                exec 3>&-
-            ) 2>/dev/null &
-            ;;
-        *)
-            echo "无效的协议: $protocol"
-            return 2
-            ;;
-    esac
+    # 验证协议输入
+    if [ "$protocol" != "tcp" ] && [ "$protocol" != "udp" ]; then
+        echo "无效的协议: $protocol"
+        return 2
+    fi
+
+    # 验证端口是否为数字
+    if ! [[ "$port" =~ ^[0-9]+$ ]]; then
+        echo "无效的端口号: $port"
+        return 2
+    fi
+
+    # 检查端口是否被占用
+    if sockstat -4l | grep -q ":$port"; then
+        echo "端口 $port ($protocol) 已被占用"
+        return 1
+    fi
+
+    # 尝试绑定端口
+    if [ "$protocol" = "tcp" ]; then
+        nc -l $port >/dev/null 2>&1 &
+    else
+        nc -u -l $port >/dev/null 2>&1 &
+    fi
 
     local pid=$!
-    local start_time=$(date +%s)
 
-    while [ $(($(date +%s) - start_time)) -lt $timeout ]; do
-        if ! kill -0 $pid 2>/dev/null; then
-            echo "端口 $port ($protocol) 可用"
-            return 0
-        fi
-    done
-
-    kill $pid 2>/dev/null
-    wait $pid 2>/dev/null
-    echo "端口 $port ($protocol) 不可用或无法绑定"
-    return 1
+    if kill -0 $pid 2>/dev/null; then
+        kill $pid
+        wait $pid 2>/dev/null
+        echo "端口 $port ($protocol) 可用且可绑定"
+        return 0
+    else
+        echo "端口 $port ($protocol) 不可绑定，可能没有权限"
+        return 1
+    fi
 }
 
 # 生成 Hysteria2 配置函数
@@ -89,9 +89,9 @@ EOF
 
 # 安装 Hysteria2
 install_hysteria2() {
-    # 检查端口是否可用
+    # 检查端口是否可用且可绑定
     if ! check_port $UDP_PORT udp; then
-        echo "端口 $UDP_PORT 不可用，请选择其他端口"
+        echo "端口 $UDP_PORT 不可用或无法绑定，请选择其他端口或检查权限"
         return 1
     fi
 
